@@ -55,7 +55,7 @@ export const App: React.FC<Props> = ({ debounce = 300, onSelected }) => {
         <h1 className="title" data-cy="title">
           {selectedPerson
             ? `${selectedPerson.name} (${selectedPerson.born} - ${selectedPerson.died})`
-            : `No selected person`}
+            : 'No selected person'}
         </h1>
 
         <div className="dropdown is-active">
