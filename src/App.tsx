@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.scss';
 import { peopleFromServer } from './data/people';
 import { Person } from './types/Person';
@@ -15,21 +15,29 @@ export const App: React.FC<Props> = ({ debounce = 300, onSelected }) => {
     useState<Person[]>(peopleFromServer);
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
-  const handleSelected = (person: Person) => {
-    setSelectedPerson(person);
+  const handleSelected = useCallback(
+    (person: Person) => {
+      setSelectedPerson(person);
+      if (onSelected) {
+        onSelected(person);
+      }
+    },
+    [onSelected],
+  );
 
-    if (onSelected) {
-      onSelected(person);
-    }
-  };
+  const handleFocus = useCallback(() => setIsFocused(true), []);
 
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => setIsFocused(false);
+  const handleBlur = useCallback(() => setIsFocused(false), []);
+
+  const handleQuery = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setQuery(event.target.value);
+    },
+    [],
+  );
+
   const showPeople =
     isFocused && query === '' ? peopleFromServer : filteredPeople;
-
-  const handleQuery = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setQuery(event.target.value);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -47,7 +55,7 @@ export const App: React.FC<Props> = ({ debounce = 300, onSelected }) => {
     if (query !== '' && selectedPerson) {
       setSelectedPerson(null);
     }
-  }, [query, selectedPerson]);
+  }, [query]);
 
   return (
     <div className="container">
@@ -55,7 +63,7 @@ export const App: React.FC<Props> = ({ debounce = 300, onSelected }) => {
         <h1 className="title" data-cy="title">
           {selectedPerson
             ? `${selectedPerson.name} (${selectedPerson.born} - ${selectedPerson.died})`
-            : 'No selected person'}
+            : `No selected person`}
         </h1>
 
         <div className="dropdown is-active">
@@ -91,11 +99,7 @@ export const App: React.FC<Props> = ({ debounce = 300, onSelected }) => {
           <div
             className="
             notification
-            is-danger
-            is-light
-            mt-3
-            is-align-self-flex-start
-          "
+            is-danger is-light mt-3 is-align-self-flex-start"
             role="alert"
             data-cy="no-suggestions-message"
           >
