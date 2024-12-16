@@ -47,7 +47,7 @@ export const App: React.FC<Props> = ({ debounce = 300, onSelected }) => {
   }, [query, debounce]);
 
   useEffect(() => {
-    if (query !== '' && selectedPerson) {
+    if (!!query && selectedPerson) {
       setSelectedPerson(null);
     }
   }, [query]);
